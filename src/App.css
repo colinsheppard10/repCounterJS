@@ -1,0 +1,20 @@
+.parent {
+  background-color: blue;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1em;
+}
+
+.child {
+  flex-grow: 1;
+  background-color: red;
+  padding: 1em;
+  margin: 1em;
+  overflow: hidden;
+}
+
+.inner {
+  padding: 1em;
+  background-color: green;
+  overflow: hidden;
+}
