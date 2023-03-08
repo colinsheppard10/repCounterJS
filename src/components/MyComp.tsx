@@ -1,11 +1,8 @@
 import { useEffect } from "react";
+import BodyContainer from "./Body";
 
 const MyComp = () => {
-  useEffect(() => {
-    console.log('hi')
-  })
-
-  return <div>hi</div>
+  return <BodyContainer/>
 }
 
 export default MyComp;
