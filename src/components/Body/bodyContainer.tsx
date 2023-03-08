@@ -3,16 +3,18 @@ import {
   drawConnectors,
   drawLandmarks,
 } from '@mediapipe/drawing_utils';
-import {Pose, POSE_CONNECTIONS, Results} from '@mediapipe/pose';
+import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import countExercise from '../Excercise/exerciseCounter';
+import { exerciseList } from '../Excercise/exercise';
 
 const BodyContainer = () => {
   const [inputVideoReady, setInputVideoReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
-
   const inputVideoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+
+  const [selectedExercises, setSelectedExercises] = useState({})
 
   useEffect(() => {
     if (!inputVideoReady) {
@@ -30,9 +32,11 @@ const BodyContainer = () => {
         sendToMediaPipe();
       });
 
-      const pose = new Pose({locateFile: (file:any) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
-      }});
+      const pose = new Pose({
+        locateFile: (file: any) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }
+      });
       pose.setOptions({
         modelComplexity: 1,
         smoothLandmarks: true,
@@ -81,9 +85,9 @@ const BodyContainer = () => {
       drawLandmarks(contextRef.current, results.poseLandmarks,
         { color: '#FF0000', lineWidth: 2 });
 
-      let {poseLandmarks} = results
-      if(poseLandmarks)
-        countExercise({poseLandmarks, exercise:{anchor1:16, anchor2:6, anchor3:2} })
+      let { poseLandmarks } = results
+      if (poseLandmarks)
+        countExercise({ poseLandmarks, exercise: { anchor1: 16, anchor2: 6, anchor3: 2 } })
 
       contextRef.current.restore();
     }
@@ -91,10 +95,15 @@ const BodyContainer = () => {
 
   return (
     <div>
+      <div>
+        {exerciseList.map((exercise) => {
+          return <div
+            onClick={()=>{}}
+          >{exercise.name}</div>
+        })}
+      </div>
       <video
         autoPlay
-        playsInline
-        muted
         height={0}
         width={0}
         ref={(el) => {
@@ -104,7 +113,7 @@ const BodyContainer = () => {
       />
       <canvas ref={canvasRef} width={1280} height={720} />
       {!loaded && (
-          <div className="message">Loading</div>
+        <div className="message">Loading</div>
       )}
     </div>
   );
