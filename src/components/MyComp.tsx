@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import BodyContainer from "./Body";
+// import BodyContainer from "./Body/bodyContainer";
+import BodyContainer from "./Body/bodyContainer";
 
 const MyComp = () => {
   return <BodyContainer/>

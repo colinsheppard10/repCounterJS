@@ -3,7 +3,8 @@ import {
   drawConnectors,
   drawLandmarks,
 } from '@mediapipe/drawing_utils';
-import {Holistic, POSE_CONNECTIONS, Results} from '@mediapipe/holistic';
+import {Pose, POSE_CONNECTIONS, Results} from '@mediapipe/pose';
+import countExercise from '../Excercise/exerciseCounter';
 
 const BodyContainer = () => {
   const [inputVideoReady, setInputVideoReady] = useState(false);
@@ -18,7 +19,6 @@ const BodyContainer = () => {
       return;
     }
     if (inputVideoRef.current && canvasRef.current) {
-      console.log('rendering');
       contextRef.current = canvasRef.current.getContext('2d');
       const constraints = {
         video: { width: { min: 1280 }, height: { min: 720 } },
@@ -30,21 +30,18 @@ const BodyContainer = () => {
         sendToMediaPipe();
       });
 
-      const holistic = new Holistic({
-        locateFile: (file: any) => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
-        }
-      });
-      holistic.setOptions({
+      const pose = new Pose({locateFile: (file:any) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+      }});
+      pose.setOptions({
         modelComplexity: 1,
         smoothLandmarks: true,
         enableSegmentation: true,
         smoothSegmentation: true,
-        refineFaceLandmarks: true,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5
       });
-      holistic.onResults(onResults);
+      pose.onResults(onResults);
 
       const sendToMediaPipe = async () => {
         if (inputVideoRef.current) {
@@ -52,7 +49,7 @@ const BodyContainer = () => {
             console.log(inputVideoRef.current.videoWidth);
             requestAnimationFrame(sendToMediaPipe);
           } else {
-            await holistic.send({ image: inputVideoRef.current });
+            await pose.send({ image: inputVideoRef.current });
             requestAnimationFrame(sendToMediaPipe);
           }
         }
@@ -84,16 +81,22 @@ const BodyContainer = () => {
       drawLandmarks(contextRef.current, results.poseLandmarks,
         { color: '#FF0000', lineWidth: 2 });
 
+      let {poseLandmarks} = results
+      if(poseLandmarks)
+        countExercise({poseLandmarks, exercise:{anchor1:16, anchor2:6, anchor3:2} })
+
       contextRef.current.restore();
     }
   };
 
   return (
-    <div className="hands-container">
+    <div>
       <video
         autoPlay
         playsInline
         muted
+        height={0}
+        width={0}
         ref={(el) => {
           inputVideoRef.current = el;
           setInputVideoReady(!!el);
@@ -101,10 +104,7 @@ const BodyContainer = () => {
       />
       <canvas ref={canvasRef} width={1280} height={720} />
       {!loaded && (
-        <div className="loading">
-          <div className="spinner"></div>
           <div className="message">Loading</div>
-        </div>
       )}
     </div>
   );
